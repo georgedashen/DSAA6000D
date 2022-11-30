@@ -165,3 +165,38 @@ poly2 <- eigs_sym(cor_mat, k = 1000)$values
 Deltacon <- DeltaCon(con_cor_mat1, con_cor_mat2)
 
 
+## ground truth
+drug_overlap <- function(cancer1, cancer2){
+  list1 <- filter(drug_aggr, `TCGA Classification` == cancer1) %>%
+    .$`Drug Name`
+  list2 <- filter(drug_aggr, `TCGA Classification` == cancer2) %>%
+    .$`Drug Name`
+  overlap <- length(intersect(list1,list2)) / ( sqrt(length(list1)) * sqrt(length(list2)) )
+}
+
+drug <- fread("C:/Users/Chenzhuoyang/Downloads/PANCANCER_IC_GDSC1.csv")
+drug <- filter(drug, `TCGA Classification` %in% CancerList)
+drug1 <- drug %>% group_by(`Drug Name`,`TCGA Classification`) %>%
+  summarise(mean_IC50 = mean(IC50))
+drug_aggr1 <- filter(drug1, mean_IC50 < 3)
+
+drug <- fread("C:/Users/Chenzhuoyang/Downloads/PANCANCER_IC_GDSC2.csv")
+drug <- filter(drug, `TCGA Classification` %in% CancerList)
+drug2 <- drug %>% group_by(`Drug Name`,`TCGA Classification`) %>%
+  summarise(mean_IC50 = mean(IC50))
+drug_aggr2 <- filter(drug2, mean_IC50 < 3)
+
+drug_aggr <- rbind(drug_aggr1, drug_aggr2)
+drug_aggr <- drug_aggr[,c(2,1)]
+drug_aggr <- arrange(drug_aggr, `TCGA Classification`)
+
+drug_sim <- data.frame(x=rep(CancerList, each = length(CancerList)),
+                       y=rep(CancerList, times = length(CancerList)))
+drug_sim <- filter(drug_sim, match(x, CancerList)<match(y, CancerList))
+
+drug_sim$overlap <- pbsapply(1:length(drug_sim), function(i) drug_overlap(drug_sim$x[i],drug_sim$y[i]))
+unique(drug_aggr$`Drug Name`)
+table(drug_aggr$`TCGA Classification`)
+hist(drug_sim$overlap)
+
+save(drug_sim, file = "drug_similarity.Rdata")
