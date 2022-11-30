@@ -9,5 +9,5 @@ firehose.R: Gives examples for data preprocessing, correlation calculation, adja
 
 simFunctions.R: Self-defined functions for preprocessing, distance and similarity calculation algorithms
 
-generateAdj_pipeline.R: Generate signed-weighted, signed-unweighted, unsigned_weighted and unsigned_unweighted adjacency matrix for all 32 cancers expression data.
+generateAdj_pipeline.R: Generate signed-weighted, signed-unweighted, unsigned_weighted and unsigned_unweighted adjacency matrix for all 33 cancers expression data.
 
