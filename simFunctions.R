@@ -10,6 +10,9 @@ library(magrittr) #pipe operation
 library(WGCNA) #co-expression network
 library(Matrix) #sparse matrix
 library(RSpectra) #high efficiency svd and eigens
+library(pbapply) #faster apply and progress bar
+library(Hmisc) #cor.test for matrix
+library(dplyr) #dataframe manipulation
 
 #### matrixConsistent =====================
 checkMatrixConsistent <- function(mat1, mat2){
@@ -59,7 +62,7 @@ Hamming_sim <- function(mat1, mat2){
   if(!checkMatrixConsistent(mat1,mat2)) 
     stop("Dimension inconsistent!")
   
-  Hamming <- sum(abs(mat1 - mat2)) / (nrow(mat1) * (nrow(mat1)-1))
+  Hamming <- sum(abs(mat1 - mat2)) / ((nrow(mat1)-1) * (nrow(mat1)-2))
   return(1-Hamming)
 }
 
@@ -72,7 +75,7 @@ Jaccard_sim <- function(mat1, mat2){
     stop("Dimension inconsistent!")
   
   Jaccard <- sum(abs(mat1 - mat2)) / 
-    (sum((abs(mat1) + abs(mat2)) !=0)-nrow(mat1))
+    sum((abs(mat1) + abs(mat2)) !=0)
   return(1-Jaccard)
 }
 
@@ -133,14 +136,13 @@ TOMsimilarity <- function(cor_mat, type="unsigned"){
 
 
 #### inverse_lbp =======================
-inverse_lbp <- function(mat){
+inverse_lbp <- function(mat, power = 10){
   #LBP = linearized belief propagation
-  mat <- as(mat, "sparseMatrix")
   N = nrow(mat)
   I = diag(1, N, N)
   I = as(I, "sparseMatrix")
   
-  # Sparse degree-diagonal matrix, D[i,i] = sum(graph[i,])
+  # Sparse degree-diagonal matrix, D[i,i] = sum(mat[i,])
   x <- rowSums(mat, sparseResult = TRUE)
   D <- sparseMatrix(c(1:N), c(1:N), x = x, dims = c(N, N))
   
@@ -154,13 +156,13 @@ inverse_lbp <- function(mat){
   ch = 2 * h_h / (1 - 4 * h_h^2)
   
   # Invert matrices M1 and M2
-  M = ch * graph  - ah * D
+  M = ch * mat  - ah * D
   
   # Calculate inverse of M
   inv_ = I
   mat_ = M
   pow = 1
-  while(max(mat_) > 1e-09 && pow < 10) {
+  while(max(mat_) > 1e-09 && pow <= power) {
     inv_ = inv_ + mat_
     mat_ = mat_ %*% M
     pow = pow + 1
@@ -183,5 +185,11 @@ DeltaCon <- function(mat1, mat2){
   return(delta_con)
 }
 
-
+#### removeLowDegree ================
+removeLowDegree <- function(mat1, mat2, degree = 1000){
+  geneList <- rownames(mat1) #assume that mat1 and mat2 has same rownames
+  g1 <- geneList[rowSums(mat1!=0)<degree]
+  g2 <- geneList[rowSums(mat2!=0)<degree]
+  return(intersect(g1, g2))
+}
 
