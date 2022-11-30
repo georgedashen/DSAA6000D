@@ -5,6 +5,8 @@ Project title: Calculating Graph Similarity for Signed Weighted Graphs from Gene
 
 Author: Zhuoyang Chen
 
+Raw data are available and downloaded directly from https://gdac.broadinstitute.org/
+
 firehose.R: Gives examples for data preprocessing, correlation calculation, adjacency matrix generation and similarity calculation
 
 simFunctions.R: Self-defined functions for preprocessing, distance and similarity calculation algorithms
