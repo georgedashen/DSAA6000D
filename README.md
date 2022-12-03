@@ -8,6 +8,8 @@ Raw data are available and downloaded directly from https://gdac.broadinstitute.
 
 firehose.R: Not used in main analysis. Gives examples for data preprocessing, correlation calculation, adjacency matrix generation and similarity calculation.
 
+DeltaCon.R: A revised version to fix some bugs and errors and make it suitable for direct sparseMatrix input, originated from github.com/bxshi
+
 simFunctions.R: Source this. Self-defined functions for preprocessing, distance and similarity calculation algorithms.
 
 generateAdj_pipeline.R: Generates signed-weighted, signed-unweighted, unsigned_weighted and unsigned_unweighted adjacency matrix for all 33 cancers expression data.
