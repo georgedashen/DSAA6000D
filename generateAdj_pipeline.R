@@ -8,7 +8,10 @@ setwd("D:/WorkFile/HKUST/graph/network/")
 dataDir <- "D:/WorkFile/Cornell_file/Thesis/TCGA/Validation/"
 source("simFunctions.R")
 CancerList <- list.files(dataDir)
-CancerList <- CancerList[-c(5,24,30,31,38)]
+CancerList <- CancerList[-c(5,15,24,30,31,38)]
+start <- "LGG"
+stop <- "LGG"
+#LAML separately processed due to missing m_Seg .Rdata
 
 ##pipeline for cancer in CancerList
 unsign_unweight = TRUE # binary 0 1
@@ -20,7 +23,11 @@ tom_cutoff = 0.1
 add_mode = FALSE
 
 for(cancer in CancerList){
+  if(match(cancer, CancerList) < match(start, CancerList)) next
+  start = CancerList[match(start, CancerList)+1]
+  if(match(cancer, CancerList) > match(stop, CancerList)) break
   if(!add_mode){
+    cat(paste0("\n",cancer," analysis begins:\n"))
     load(paste0(dataDir,cancer,"/m_Seg_",tolower(cancer),"_firehose.Rdata"))
     expr <- m_Seg$RSEM
     rm(m_Seg)
@@ -38,8 +45,10 @@ for(cancer in CancerList){
                sum(geneFilter)/length(geneFilter),"%)\n"))
     expr <- expr[geneFilter,]
     expr <- log(expr+0.1)
+    rm(sdRSEM, meanRSEM, ptsRSEM, geneFilter);gc()
     
     ##correlation matrix
+    cat("\nGenerating Z-scores:\n")
     mu <- pbapply(expr, 2, mean, cl=7)
     sigma <- pbapply(expr, 2, sd, cl=7)
     Mu <- rep(mu, times=nrow(expr)) %>% 
@@ -49,8 +58,26 @@ for(cancer in CancerList){
     expr <- (expr - Mu) / Sigma
     rm(Mu, Sigma)
     gc()
-    cor_mat <- cor(t(expr))
     
+    cat("\nCalculating correlation:\n")
+    R <- rcorr(t(expr),type="pearson")
+    R$n <- NULL;gc()
+    cat("\nGet cor_mat:\n")
+    cor_mat <- R$r
+    R$r <- NULL;gc()
+    cat("\nGet p_mat:\n")
+    p_adj <- R$P
+    rm(R);gc()
+    diag(p_adj) <- 0
+    p_adj <- p_adj * (ncol(expr)-1) * (ncol(expr)-2) / 2 #bonferroni
+    cor_mat[p_adj>0.05] = 0
+    cor_mat <- as(cor_mat, "sparseMatrix")
+    
+    save(cor_mat, file = paste0(cancer,"_cor_mat.Rdata"))
+    rm(expr, p_adj);gc()
+    
+    cat("\nCalculating adjacency matrix:\n")
+    diag(cor_mat) <- 0
     network <- list()
     if(sign_weight){
       cor_mat_sw <- cor_mat
@@ -85,8 +112,10 @@ for(cancer in CancerList){
       names(network)[length(network)] <- "unsign_weight"
     }
     
-    save(cor_mat, file = paste0(cancer,"_cor_mat.Rdata"))
     save(network, file = paste0(cancer,"_cor_threshold",cor_cutoff,"_network.Rdata"))
+    rm(cor_mat, network, cor_mat_su, cor_mat_sw, cor_mat_uu, cor_mat_uw)
+    gc()
+    
   } else{
     #retrieve cor_mats from the pre-defined cor_cutoff
     load(file = paste0(cancer,"_cor_threshold",cor_cutoff,"_network.Rdata"))
@@ -104,6 +133,7 @@ for(cancer in CancerList){
     
     
     save(network, file = paste0(cancer,"_cor_threshold",cor_cutoff,"_network.Rdata"))
+    gc()
   }  
   
   

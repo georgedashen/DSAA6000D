@@ -84,9 +84,9 @@ Jaccard_sim <- function(mat1, mat2){
 
 #### spectral ==============================
 spectral_dist <- function(mat1, mat2, p=1, k=min(nrow(mat1),nrow(mat2))){
-  if(nrow(mat1)==nrow(mat2) || ncol(mat1)==ncol(mat2)) 
-    warning("Dimension not need to be consistent!")
-  
+  # if(nrow(mat1)==nrow(mat2) || ncol(mat1)==ncol(mat2)) 
+  #   warning("Dimension not need to be consistent!")
+  # 
   if(k > min(nrow(mat1),nrow(mat2))) stop("Please decrease k!")
   
   
@@ -94,7 +94,7 @@ spectral_dist <- function(mat1, mat2, p=1, k=min(nrow(mat1),nrow(mat2))){
   poly2 <- eigs_sym(mat2, k = k)$values
   
   if(p == 1){
-    return((sum(abs(poly1-poly2)))^(1/p))
+    return((sum(abs(poly1-poly2))))
   } else{
     return((sum((poly1-poly2)^p))^(1/p))
   }
@@ -185,11 +185,58 @@ DeltaCon <- function(mat1, mat2){
   return(delta_con)
 }
 
+
+
+
 #### removeLowDegree ================
 removeLowDegree <- function(mat1, mat2, degree = 1000){
   geneList <- rownames(mat1) #assume that mat1 and mat2 has same rownames
   g1 <- geneList[rowSums(mat1!=0)<degree]
   g2 <- geneList[rowSums(mat2!=0)<degree]
   return(intersect(g1, g2))
+}
+
+
+
+
+#### simList2Mat ==========================================
+simList2Mat <- function(s){
+  mat <- matrix(0, nrow = 33, ncol = 33)
+  rownames(mat) = colnames(mat) = CancerTerm$Cohort[match(CancerList, CancerTerm$Cohort)]
+  for(i in 1:nrow(drug_sim)){
+    mat[drug_sim$x[i], drug_sim$y[i]] = s[i]
+  }
+  mat = mat + t(mat)
+  diag(mat) = 1
+  rownames(mat) = colnames(mat) = CancerTerm$Tissue[match(CancerList, CancerTerm$Cohort)]
+  return(mat)
+}
+
+
+#### simHeatmap =====================
+simHeatmap <- function(mat, Ncluster = 10, legend = NULL, ylab = NULL, titleFont = 20,
+                       showRow = FALSE, gridBorder = 0){
+  set.seed(667)
+  Heatmap(mat,
+          column_km = Ncluster, column_km_repeats = 500,
+          row_km = Ncluster, row_km_repeats = 500,
+          col = colorRamp2(c(0, 1), c("white", "red")),
+          #cluster_rows = cluster_within_group(expr[,rownames(df)], as.factor(sorted)), 
+          #cluster_columns = T, cluster_rows = T,
+          show_column_names = T,show_row_names = showRow, show_row_dend = showRow,
+          heatmap_legend_param = list(title = legend, direction = "vertical",
+                                      title_position = "leftcenter-rot",at=c(0,1),legend_height = unit(3, "cm")),
+          #top_annotation = top_anno,left_annotation = left_anno,
+          row_title = NULL, column_title = ylab, column_title_side = "top",
+          column_title_gp = gpar(fontsize = titleFont, fontface = "bold"),
+          rect_gp = gpar(col = "white", lwd = gridBorder))
+}
+
+
+
+
+#### getVEnum ====================
+getVEnum <- function(mat){
+  return(c(nrow(mat),sum(mat!=0)))
 }
 

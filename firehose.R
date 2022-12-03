@@ -9,7 +9,7 @@ dataDir <- "D:/WorkFile/Cornell_file/Thesis/TCGA/Validation/"
 source("simFunctions.R")
 CancerList <- list.files(dataDir)
 CancerList <- CancerList[-c(5,24,30,31,38)]
-CancerList
+saveRDS(CancerList, file = "cancerList.rds")
 
 ##pipeline for cancer in CancerList
 load(paste0(dataDir,cancer,"/m_Seg_",tolower(cancer),"_firehose.Rdata"))
@@ -200,3 +200,9 @@ table(drug_aggr$`TCGA Classification`)
 hist(drug_sim$overlap)
 
 save(drug_sim, file = "drug_similarity.Rdata")
+
+## LAML data
+load("D:/WorkFile/Cornell_file/Thesis/TCGA/Validation/LAML/RSEM.Rdata")
+m_Seg <- list(expr)
+names(m_Seg) <- "RSEM"
+save(m_Seg, file = "D:/WorkFile/Cornell_file/Thesis/TCGA/Validation/LAML/m_Seg_laml_firehose.Rdata")

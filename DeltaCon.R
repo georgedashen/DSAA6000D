@@ -1,3 +1,10 @@
+######################################
+## Revisor: Chenzhuoyang
+## Date: 2022-11-28
+## Content: revised the R version of DeltaCon
+#####################################
+
+
 ####### Please Check github.com/bxshi/rdsg for new updates, this gist will not be change in the future #######
 ## However, you can still use this since it is correct so far ##
 
@@ -69,8 +76,8 @@ inverse_lbp <- function(graph, priors=NULL, power = 10, times = 10, debug = FALS
     final_mat <- NULL
     tim <- system.time({
       for(i in c(1:times)) {
-        inv_ = matrix(priors[, i], nnodes, 1)
-        mat_ = matrix(priors[, i], nnodes, 1)
+        inv_ = matrix(priors[, i], nnodes, 1) %>% as("sparseMatrix")
+        mat_ = matrix(priors[, i], nnodes, 1) %>% as("sparseMatrix")
         pow = 1
         while(max(mat_) > 1e-09 && pow < power) {
           mat_ = M %*% mat_
@@ -78,9 +85,9 @@ inverse_lbp <- function(graph, priors=NULL, power = 10, times = 10, debug = FALS
           pow = pow + 1
         }
         if (i == 1) {
-          final_mat <- matrix(inv_)
+          final_mat <- matrix(inv_) as("sparseMatrix")
         } else {
-          final_mat <- cbind(final_mat, matrix(inv_))
+          final_mat <- cbind(final_mat, matrix(inv_)) as("sparseMatrix")
         }
       }
     })
@@ -109,6 +116,7 @@ init_priors_percent <- function(percent, nnodes) {
 delta_con <- function(g1, g2, method = "naive", power = 10,
                       percent = 0.1, removeDegree = 1000, debug = FALSE) {
   
+  geneList <- rownames(g1)
   removeGene <- removeLowDegree(g1, g2, degree = removeDegree)
   removeGene <- match(removeGene, geneList) #reduce memory
   g1 <- g1[-removeGene, -removeGene]
@@ -131,8 +139,8 @@ delta_con <- function(g1, g2, method = "naive", power = 10,
       })
       output_time(debug, tim, "Calculate priors")
       
-      inv1 <- inverse_lbp(g1, priors, power = power, ngroups, debug = debug)# * (.p - 0.5)
-      inv2 <- inverse_lbp(g2, priors, power = power, ngroups, debug = debug)# * (.p - 0.5)
+      inv1 <- inverse_lbp(g1, priors, power = power, ngroups, debug = debug)
+      inv2 <- inverse_lbp(g2, priors, power = power, ngroups, debug = debug)
       sim[i] <- 1 / (1 + sqrt(sum( (sqrt(inv1) - sqrt(inv2))^2 )))
     }
     delta_con <- mean(sim)

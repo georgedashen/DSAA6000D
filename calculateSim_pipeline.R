@@ -118,18 +118,19 @@ analyzeSpectral <- function(matrixType, p = 2, k = 10){
   s = drug_sim$overlap
   start <- Sys.time()
   for(i in 1:length(s)){
-    s[i] = Jaccard_sim(matList[[drug_sim$x[i]]], matList[[drug_sim$y[i]]])
+    s[i] = spectral_dist(matList[[drug_sim$x[i]]], matList[[drug_sim$y[i]]], p = p, k = k)
     print(paste0(format(i/length(s)*100,digits=3),"%"))
   }
   print(paste0(Sys.time() - start))
+  s = (max(s) - s) + 1
   saveRDS(s, file = paste0(matrixType, "_Spectral.rds"))
   plot(order(s), order(drug_sim$overlap))
 }
 
-analyzeSpectral("unsign_unweight") #33.069
-analyzeSpectral("sign_unweight") #32.49
-analyzeSpectral("unsign_weight") #33.66
-analyzeSpectral("sign_weight") #33.30
+analyzeSpectral("unsign_unweight") #11.89 min
+analyzeSpectral("sign_unweight") #11.25
+analyzeSpectral("unsign_weight") #11.69
+analyzeSpectral("sign_weight") #10.73
 
 
 ## DeltaCon
@@ -150,7 +151,42 @@ analyzeDeltaCon <- function(matrixType){
   plot(order(s), order(drug_sim$overlap))
 }
 
-analyzeDeltaCon("unsign_unweight") # 2h 11m
-analyzeDeltaCon("sign_unweight") # 2h 17m
-analyzeDeltaCon("unsign_weight") # 2h 23m
-analyzeDeltaCon("sign_weight") # 2h 6m
+analyzeDeltaCon("unsign_unweight") # 2h 6m
+analyzeDeltaCon("sign_unweight") # 2h 10m
+analyzeDeltaCon("unsign_weight") # 2h 14m
+analyzeDeltaCon("sign_weight") # 2h 4m
+
+
+##size of mat
+unsign_unweight <- readRDS("unsign_unweight_unified.rds")
+Size <- pblapply(unsign_unweight, function(m) getVEnum(m)) %>% bind_rows()
+Size <- t(Size) %>% as.data.frame()
+colnames(Size) <- c("Num_nodes","Num_edges")
+summary(Size$Num_edges)
+#      Min.  1st Qu.   Median     Mean      3rd Qu.     Max. 
+# 0.776168  2.764940  4.976554  7.751560  8.024516 32.474904 (Million)
+saveRDS(Size, file = "processed_size.rds")
+
+
+getConsistSize <- function(g1, g2) {
+  geneList <- rownames(g1)
+  removeGene <- removeLowDegree(g1, g2)
+  removeGene <- match(removeGene, geneList) #reduce memory
+  g1 <- g1[-removeGene, -removeGene]
+  g2 <- g2[-removeGene, -removeGene]
+  
+  return(c(nrow(g1),sum(g1!=0),nrow(g2),sum(g2!=0)))
+}
+
+index <- 1:nrow(drug_sim)
+names(index) <- as.character(1:nrow(drug_sim))
+SizeDeltaCon <- pblapply(index, function(i){
+  getConsistSize(unsign_unweight[[drug_sim$x[i]]],unsign_unweight[[drug_sim$y[i]]])}) %>% bind_rows()
+SizeDeltaCon <- t(SizeDeltaCon) %>% as.data.frame()
+colnames(SizeDeltaCon) <- c("Num_nodes_g1","Num_edges_g1","Num_nodes_g2","Num_edges_g2")
+summary(SizeDeltaCon)
+summary(c(SizeDeltaCon$Num_edges_g1,SizeDeltaCon$Num_edges_g2))
+# node range from 60 to 13374, mean 4285
+# edge range from 482 to 30M, mean 4M, median 1M
+# It's reported that 1M edge graphs takes 160sec for DeltaCon
+# One could reduce the accuracy of approximation by decrease repetition, decrease power and tolerance
