@@ -225,10 +225,23 @@ sign_unweight <- readRDS("sign_unweight_unified.rds")
 Degree <- pblapply(sign_unweight, function(m) getDegree(m)) %>% bind_rows()
 Degree <- t(Degree) %>% as.data.frame()
 colnames(Degree) <- CancerList
-summary(Sign$pos_edges)
 
-
-
+df_degree <- data.frame(cancer = CancerList)
+df_degree$`<1k` <- pbapply(Degree, 2, function(m) sum(m>=0 & m<1000))
+df_degree$`1-2k` <- pbapply(Degree, 2, function(m) sum(m>=1000 & m<2000))
+df_degree$`2-3k` <- pbapply(Degree, 2, function(m) sum(m>=2000 & m<3000))
+df_degree$`3-4k` <- pbapply(Degree, 2, function(m) sum(m>=3000 & m<4000))
+df_degree$`4-5k` <- pbapply(Degree, 2, function(m) sum(m>=4000 & m<5000))
+df_degree$`5-6k` <- pbapply(Degree, 2, function(m) sum(m>=5000 & m<6000))
+df_degree$`>6k` <- pbapply(Degree, 2, function(m) sum(m>=6000))
+df_degree_long <- gather(df_degree, key = "Degrees", value = "Num_nodes", 2:8)
+df_degree_long$Degrees <- factor(df_degree_long$Degrees, levels = c("<1k","1-2k","2-3k","3-4k","4-5k","5-6k",">6k"))
+ggplot(df_degree_long, aes(Degrees, Num_nodes, fill=Degrees)) + geom_boxplot() + theme_classic(base_size = 20) + 
+  annotate("text", x=1, y=6500, label="Mean:") + annotate("text", x=1, y=5000, label="16941") +
+  annotate("text", x=2, y=5000, label="1346") + annotate("text", x=3, y=5000, label="526") + annotate("text", x=4, y=5000, label="288") +
+  annotate("text", x=5, y=5000, label="166") + annotate("text", x=6, y=5000, label="72") +annotate("text", x=7, y=5000, label="5") +
+  scale_y_continuous(expand = expansion(mult = c(0.05, 0.05))) + NoLegend()
+ggsave("degree_distribution.png", width = 5, height = 4)
 
 #shrunk mat info.
 getConsistSize <- function(g1, g2) {
