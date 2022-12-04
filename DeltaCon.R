@@ -85,9 +85,9 @@ inverse_lbp <- function(graph, priors=NULL, power = 10, times = 10, debug = FALS
           pow = pow + 1
         }
         if (i == 1) {
-          final_mat <- matrix(inv_) as("sparseMatrix")
+          final_mat <- matrix(inv_) %>% as("sparseMatrix")
         } else {
-          final_mat <- cbind(final_mat, matrix(inv_)) as("sparseMatrix")
+          final_mat <- cbind(final_mat, matrix(inv_)) %>% as("sparseMatrix")
         }
       }
     })
@@ -113,7 +113,7 @@ init_priors_percent <- function(percent, nnodes) {
   return(rand_mat)
 }
 
-delta_con <- function(g1, g2, method = "naive", power = 10,
+delta_con <- function(g1, g2, method = "naive", power = 10, repetiton = 5,
                       percent = 0.1, removeDegree = 1000, debug = FALSE) {
   
   geneList <- rownames(g1)
@@ -129,10 +129,10 @@ delta_con <- function(g1, g2, method = "naive", power = 10,
     # Number of groups to be initialized
     ngroups <- ceiling(1 / percent)
     
-    repetitions <- 5
-    t_all <- rep(0, repetitions)
-    sim <- rep(0, repetitions)
-    for(i in c(1:repetitions)) {
+    Repetitions <- repetiton
+    t_all <- rep(0, Repetitions)
+    sim <- rep(0, Repetitions)
+    for(i in c(1:Repetitions)) {
       priors <- NULL
       tim <- system.time({
         priors <- init_priors_percent(percent, nnodes)
@@ -147,8 +147,8 @@ delta_con <- function(g1, g2, method = "naive", power = 10,
     return(delta_con)
   } else {
     # Naive FaBP
-    inv1 <- inverse_lbp(g1, debug = debug) * (.p - 0.5)
-    inv2 <- inverse_lbp(g2, debug = debug) * (.p - 0.5)
+    inv1 <- inverse_lbp(g1, debug = debug)
+    inv2 <- inverse_lbp(g2, debug = debug)
     
     # Compute DeltaCon similarity score
     delta_con <- 1 / (1 + sqrt(sum( (sqrt(inv1) - sqrt(inv2))^2 )))

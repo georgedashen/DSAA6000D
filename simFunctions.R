@@ -214,7 +214,7 @@ simList2Mat <- function(s){
 
 
 #### simHeatmap =====================
-simHeatmap <- function(mat, Ncluster = 10, legend = NULL, ylab = NULL, titleFont = 20,
+simHeatmap <- function(mat, Ncluster = 10, legend = NULL, ylab = NULL, titleFont = 20, columnFont = 15,
                        showRow = FALSE, gridBorder = 0){
   set.seed(667)
   Heatmap(mat,
@@ -229,7 +229,10 @@ simHeatmap <- function(mat, Ncluster = 10, legend = NULL, ylab = NULL, titleFont
           #top_annotation = top_anno,left_annotation = left_anno,
           row_title = NULL, column_title = ylab, column_title_side = "top",
           column_title_gp = gpar(fontsize = titleFont, fontface = "bold"),
-          rect_gp = gpar(col = "white", lwd = gridBorder))
+          column_names_gp = grid::gpar(fontsize = columnFont),
+          column_names_rot = 45,
+          rect_gp = gpar(col = "white", lwd = gridBorder)) -> ht
+  draw(ht, padding = unit(c(2, 15, 2, 2), "mm"))
 }
 
 
@@ -240,3 +243,30 @@ getVEnum <- function(mat){
   return(c(nrow(mat),sum(mat!=0)))
 }
 
+
+
+
+#### getSignEnum =================
+getSignEnum <- function(mat){
+  return(c(sum(mat>0),sum(mat<0)))
+}
+
+
+
+
+#### getSignEnum =================
+getWeigthDiff <- function(mat, upper = 1.0, lower = 0.9){
+  gc()
+  L <- mat>=lower
+  U <- mat<=upper
+  U[!L]=FALSE
+  return(sum(U))
+}
+
+
+
+
+#### getDegree =================
+getDegree <- function(mat){
+  return(colSums(mat!=0))
+}

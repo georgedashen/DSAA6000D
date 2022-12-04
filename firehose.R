@@ -206,3 +206,23 @@ load("D:/WorkFile/Cornell_file/Thesis/TCGA/Validation/LAML/RSEM.Rdata")
 m_Seg <- list(expr)
 names(m_Seg) <- "RSEM"
 save(m_Seg, file = "D:/WorkFile/Cornell_file/Thesis/TCGA/Validation/LAML/m_Seg_laml_firehose.Rdata")
+
+## revise spectral
+reviseSpectral <- function(matrixType){
+  if(!matrixType %in% c("unsign_unweight","unsign_weight","sign_unweight","sign_weight"))
+    stop("Unknown matrix type!")
+  s = readRDS(paste0(matrixType, "_Spectral.rds"))
+  s = s - 1
+  s = (max(s) - s) / (max(s) + 1)#(max(s) - s) + 1
+  saveRDS(s, file = paste0(matrixType, "_Spectral.rds"))
+  plot(order(s), order(drug_sim$overlap))
+}
+
+## check patient duplication
+patientList <- c()
+for (cancer in CancerList) {
+  load(paste0(dataDir,cancer,"/m_Seg_",tolower(cancer),"_firehose.Rdata"))
+  patientList <- c(colnames(m_Seg$RSEM),patientList)
+}
+length(patientList) #10263
+sum(duplicated(patientList)) #0

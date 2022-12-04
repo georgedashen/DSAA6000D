@@ -100,23 +100,23 @@ drug_sim$sw_Jaccard <- s
 sw <- simList2Mat(s)
 
 png("unsign_unweigt_Jaccard_TCGAsim.png", width = 10, height = 8, units = "in", res = 300)
-simHeatmap(uu, Ncluster = 5, legend = "Jaccard Similarity", ylab = "Jaccard: Unsign Unweight Adj")
+simHeatmap(uu, Ncluster = 5, legend = "Jaccard Similarity", ylab = "Jaccard: Unsign Unweight Adj", columnFont = 18)
 dev.off()
 
 png("unsign_weigt_Jaccard_TCGAsim.png", width = 10, height = 8, units = "in", res = 300)
-simHeatmap(uw, Ncluster = 5, legend = "Jaccard Similarity", ylab = "Jaccard: Unsign Weight Adj")
+simHeatmap(uw, Ncluster = 5, legend = "Jaccard Similarity", ylab = "Jaccard: Unsign Weight Adj", columnFont = 18)
 dev.off()
 
 png("sign_unweigt_Jaccard_TCGAsim.png", width = 10, height = 8, units = "in", res = 300)
-simHeatmap(su, Ncluster = 5, legend = "Jaccard Similarity", ylab = "Jaccard: Sign Unweight Adj")
+simHeatmap(su, Ncluster = 5, legend = "Jaccard Similarity", ylab = "Jaccard: Sign Unweight Adj", columnFont = 18)
 dev.off()
 
 png("sign_weigt_Jaccard_TCGAsim.png", width = 10, height = 8, units = "in", res = 300)
-simHeatmap(sw, Ncluster = 5, legend = "Jaccard Similarity", ylab = "Jaccard: Sign Weight Adj")
+simHeatmap(sw, Ncluster = 5, legend = "Jaccard Similarity", ylab = "Jaccard: Sign Weight Adj", columnFont = 18)
 dev.off()
 
 #
-png("Jaccard_Adj_heatmap.png", width = 5, height = 4, units = "in", res = 300)
+png("Jaccard_Adj_heatmap.png", width = 6, height = 5, units = "in", res = 300)
 simHeatmap(cor(drug_sim[c(4:7)], method = "spearman"), Ncluster = 2, showRow = T, 
            legend = "Spearman rho", ylab = "Correlation of Jaccard Similarity \nacorss AdjMat Types")
 dev.off()
@@ -125,7 +125,9 @@ png("Jaccard_Adj_corchat.png", width = 10, height = 8, units = "in", res = 300)
 chart.Correlation(drug_sim[,c(4:7)], method = "spearman")
 dev.off()
 
-
+png("Jaccard_Adj_corchat_pearson.png", width = 10, height = 8, units = "in", res = 300)
+chart.Correlation(drug_sim[,c(4:7)], method = "pearson")
+dev.off()
 
 #Spectral
 s <- readRDS("unsign_unweight_Spectral.rds")
@@ -145,32 +147,34 @@ drug_sim$sw_Spectral <- s
 sw <- simList2Mat(s)
 
 png("unsign_unweigt_Spectral_TCGAsim.png", width = 10, height = 8, units = "in", res = 300)
-simHeatmap(uu, Ncluster = 5, legend = "Spectral Similarity", ylab = "Spectral: Unsign Unweight Adj")
+simHeatmap(uu, Ncluster = 5, legend = "Spectral Similarity", ylab = "Spectral: Unsign Unweight Adj", columnFont = 18)
 dev.off()
 
 png("unsign_weigt_Spectral_TCGAsim.png", width = 10, height = 8, units = "in", res = 300)
-simHeatmap(uw, Ncluster = 5, legend = "Spectral Similarity", ylab = "Spectral: Unsign Weight Adj")
+simHeatmap(uw, Ncluster = 5, legend = "Spectral Similarity", ylab = "Spectral: Unsign Weight Adj", columnFont = 18)
 dev.off()
 
 png("sign_unweigt_Spectral_TCGAsim.png", width = 10, height = 8, units = "in", res = 300)
-simHeatmap(su, Ncluster = 5, legend = "Spectral Similarity", ylab = "Spectral: Sign Unweight Adj")
+simHeatmap(su, Ncluster = 5, legend = "Spectral Similarity", ylab = "Spectral: Sign Unweight Adj", columnFont = 18)
 dev.off()
 
 png("sign_weigt_Spectral_TCGAsim.png", width = 10, height = 8, units = "in", res = 300)
-simHeatmap(sw, Ncluster = 5, legend = "Spectral Similarity", ylab = "Spectral: Sign Weight Adj")
+simHeatmap(sw, Ncluster = 5, legend = "Spectral Similarity", ylab = "Spectral: Sign Weight Adj", columnFont = 18)
 dev.off()
 
 #
-png("Spectral_Adj_heatmap.png", width = 5, height = 4, units = "in", res = 300)
-simHeatmap(cor(drug_sim[c(4:7)], method = "spearman"), Ncluster = 2, showRow = T, 
+png("Spectral_Adj_heatmap.png", width = 6, height = 5, units = "in", res = 300)
+simHeatmap(cor(drug_sim[c(8:11)], method = "spearman"), Ncluster = 2, showRow = T, 
            legend = "Spearman rho", ylab = "Correlation of Spectral-dist Similarity\nacorss AdjMat Types")
 dev.off()
 
 png("Spectral_Adj_corchat.png", width = 10, height = 8, units = "in", res = 300)
-chart.Correlation(drug_sim[,c(4:7)], method = "spearman")
+chart.Correlation(drug_sim[,c(8:11)], method = "spearman")
 dev.off()
 
-
+png("Spectral_Adj_corchat_pearson.png", width = 10, height = 8, units = "in", res = 300)
+chart.Correlation(drug_sim[,c(8:11)], method = "pearson")
+dev.off()
 
 # DeltaCon
 s <- readRDS("unsign_unweight_DeltaCon.rds")
@@ -190,33 +194,33 @@ drug_sim$sw_DeltaCon <- s
 sw <- simList2Mat(s)
 
 png("unsign_unweigt_DeltaCon_TCGAsim.png", width = 10, height = 8, units = "in", res = 300)
-simHeatmap(uu, Ncluster = 5, legend = "DeltaCon Similarity", ylab = "DeltaCon: Unsign Unweight Adj")
+simHeatmap(uu, Ncluster = 5, legend = "DeltaCon Similarity", ylab = "DeltaCon: Unsign Unweight Adj", columnFont = 18)
 dev.off()
 
 png("unsign_weigt_DeltaCon_TCGAsim.png", width = 10, height = 8, units = "in", res = 300)
-simHeatmap(uw, Ncluster = 5, legend = "DeltaCon Similarity", ylab = "DeltaCon: Unsign Weight Adj")
+simHeatmap(uw, Ncluster = 5, legend = "DeltaCon Similarity", ylab = "DeltaCon: Unsign Weight Adj", columnFont = 18)
 dev.off()
 
 png("sign_unweigt_DeltaCon_TCGAsim.png", width = 10, height = 8, units = "in", res = 300)
-simHeatmap(su, Ncluster = 5, legend = "DeltaCon Similarity", ylab = "DeltaCon: Sign Unweight Adj")
+simHeatmap(su, Ncluster = 5, legend = "DeltaCon Similarity", ylab = "DeltaCon: Sign Unweight Adj", columnFont = 18)
 dev.off()
 
 png("sign_weigt_DeltaCon_TCGAsim.png", width = 10, height = 8, units = "in", res = 300)
-simHeatmap(sw, Ncluster = 5, legend = "DeltaCon Similarity", ylab = "DeltaCon: Sign Weight Adj")
+simHeatmap(sw, Ncluster = 5, legend = "DeltaCon Similarity", ylab = "DeltaCon: Sign Weight Adj", columnFont = 18)
 dev.off()
 
 #
-png("DeltaCon_Adj_heatmap.png", width = 5, height = 4, units = "in", res = 300)
-simHeatmap(cor(drug_sim[c(4:7)], method = "spearman"), Ncluster = 2, showRow = T, 
+png("DeltaCon_Adj_heatmap.png", width = 6, height = 5, units = "in", res = 300)
+simHeatmap(cor(drug_sim[c(12:15)], method = "spearman"), Ncluster = 2, showRow = T, 
            legend = "Spearman rho", ylab = "Correlation of DeltaCon Similarity \nacorss AdjMat Types")
 dev.off()
 
 png("DeltaCon_Adj_corchat.png", width = 10, height = 8, units = "in", res = 300)
-chart.Correlation(drug_sim[,c(4:7)], method = "spearman")
+chart.Correlation(drug_sim[,c(12:15)], method = "spearman")
 dev.off()
 
 #
-png("All_Adj_heatmap.png", width = 10, height = 8, units = "in", res = 300)
+png("All_Adj_heatmap.png", width = 6, height = 5, units = "in", res = 300)
 simHeatmap(cor(drug_sim[c(4:15)], method = "spearman"), Ncluster = 2, showRow = T, 
            legend = "Spearman rho", ylab = "Correlation of All Similarity \nacorss AdjMat Types")
 dev.off()
@@ -230,7 +234,7 @@ corMeanExpr <- cor(mean_expr_mat, method = "spearman")
 colnames(corMeanExpr) = rownames(corMeanExpr) = CancerTerm$Cohort[match(colnames(corMeanExpr), CancerTerm$Tissue)]
 drug_sim$meanExpr <- pbsapply(1:nrow(drug_sim), function(i) corMeanExpr[drug_sim$x[i], drug_sim$y[i]])
 
-png("Allexpr_Adj_heatmap.png", width = 10, height = 8, units = "in", res = 300)
+png("Allexpr_Adj_heatmap.png", width = 6, height = 5, units = "in", res = 300)
 simHeatmap(cor(drug_sim[c(4:16)], method = "spearman"), Ncluster = 2, showRow = T, 
            legend = "Spearman rho", ylab = "Correlation of All Similarity \nacorss AdjMat Types")
 dev.off()
@@ -251,11 +255,11 @@ dev.off()
 ### represent still not clear, the expression matrix similarity itself already well represents
 ### the cell origin and tissue characteristic.
 
-timeConsume <- data.frame(method = rep(c("Jaccard", "Spectral", "DeltaCon"), each = 4),
+timeConsume <- data.frame(method = rep(c("Jaccard", "Spectral(eigen50)", "DeltaCon(power4)"), each = 4),
                           adjmat = rep(c("unsign_unweight", "sign_unweight", "unsign_weight", "sign_weight"), times = 3))
-timeConsume$method <- factor(timeConsume$method, levels = c("Jaccard","Spectral","DeltaCon"))
-timeConsume$adjmat <- factor(timeConsume$adjmat, levels = c("unsign_unweight", "sign_unweight", "unsign_weight", "sign_weight"))
-timeConsume$elapsed <- c(30.1, 31.5, 33.0, 32.7, 11.9, 11.2, 11.7, 10.7, 126, 130, 134, 124)
+timeConsume$method <- factor(timeConsume$method, levels = c("Jaccard","Spectral(eigen50)","DeltaCon(power4)"))
+timeConsume$adjmat <- factor(timeConsume$adjmat, levels = c("sign_unweight", "sign_weight", "unsign_unweight", "unsign_weight"))
+timeConsume$elapsed <- c(30.1, 31.5, 33.0, 32.7, 40.6, 41.6, 39.4, 40.2, 126, 130, 134, 124)
 
 library(ggplot2)
 library(Seurat)
@@ -265,5 +269,10 @@ ggplot(timeConsume, aes(adjmat, elapsed, fill = adjmat)) + geom_bar(stat="identi
   scale_y_continuous(breaks = c(0,25,50,75,100,125,150),
                      expand = expansion(mult = c(0, 0.1))) +
   theme_bw(base_size = 20) + theme(panel.grid.major.x = element_blank(), panel.grid.minor.y = element_blank()) + 
+  theme(legend.title = element_text(size=12),
+        legend.text = element_text(size = 10),
+        legend.key.size = unit(0.5,"cm"),
+        legend.box.margin=margin(-10,-10,-10,-10),
+        legend.margin=margin(0,0,0,0)) +
   RotatedAxis() + scale_fill_manual(values=c("#fdae61","#d7191c","#abd9e9","#2c7bb6"))
 ggsave("elapsed_time.png", width = 9, height = 6)
